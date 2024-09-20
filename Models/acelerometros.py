@@ -7,26 +7,22 @@ DB_PATH_SEVERITY = os.path.join(os.path.dirname(__file__), '..', 'Data', 'severi
 DB_PATH_ENVELOPE = os.path.join(os.path.dirname(__file__), '..', 'Data', 'envelope.db')
 
 # Função para buscar dados dos sensores de acelerômetro
-def fetch_sensor_data(start_date=None, end_date=None):
-    try:
-        connection = sqlite3.connect(DB_PATH_ACCELEROMETER)
-        cursor = connection.cursor()
+def fetch_sensor_data(start_timestamp, end_timestamp):
+    connection = sqlite3.connect(DB_PATH_ACCELEROMETER)
+    cursor = connection.cursor()
+    
+    # Consulta SQL para selecionar os dados dentro do intervalo de tempo
+    query = '''
+        SELECT timestamp, sensor1_value, sensor2_value, sensor3_value
+        FROM sensor_data
+        WHERE timestamp BETWEEN ? AND ?
+        ORDER BY timestamp ASC
+    '''
+    cursor.execute(query, (start_timestamp, end_timestamp))
+    data = cursor.fetchall()
+    connection.close()
 
-        query = "SELECT timestamp, sensor1_value, sensor2_value, sensor3_value FROM sensor_data"
-        params = ()
-
-        if start_date and end_date:
-            query += " WHERE timestamp BETWEEN ? AND ?"
-            params = (start_date, end_date)
-
-        cursor.execute(query, params)
-        data = cursor.fetchall()
-        connection.close()
-
-        return data
-    except sqlite3.Error as e:
-        print(f"Erro ao acessar o banco de dados dos acelerômetros: {e}")
-        return []
+    return data
 
 # Função para buscar dados de severidade
 def fetch_severity_data(start_date=None, end_date=None):

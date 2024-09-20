@@ -6,7 +6,6 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Importação das funcionalidades de cada aba
-from GUI.cadastro import show_cadastro
 from GUI.tendencias import show_graph
 from GUI.erros import show_errors
 from GUI.dados_brutos import show_acelerometro_data
@@ -42,10 +41,6 @@ graph_button.pack(pady=10, padx=10)
 error_button = ctk.CTkButton(sidebar_frame, text="Erros", command=lambda: show_errors(main_frame))
 error_button.pack(pady=10, padx=10)
 
-# Passando a função refresh_all_tabs como argumento para o botão "Cadastro"
-cadastro_button = ctk.CTkButton(sidebar_frame, text="Cadastro", command=lambda: show_cadastro(main_frame, refresh_all_tabs))
-cadastro_button.pack(pady=10, padx=10)
-
 contact_button = ctk.CTkButton(sidebar_frame, text="Contato", command=lambda: show_contact_info(main_frame))
 contact_button.pack(pady=10, padx=10)
 
@@ -53,3 +48,4 @@ contact_button.pack(pady=10, padx=10)
 show_acelerometro_data(main_frame)
 
 root.mainloop()
+ 

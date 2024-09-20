@@ -46,14 +46,14 @@ def create_envelope_table():
     connection.commit()
     connection.close()
 
-# Função para inserir dados simulados nos acelerômetros
+# Função para inserir dados simulados nos acelerômetros a cada 2 minutos começando dois dias atrás
 def insert_accelerometer_data():
     connection = sqlite3.connect('Data/sensors.db')
     cursor = connection.cursor()
 
-    now = datetime.now()
-    for i in range(7 * 24 * 60):  # 7 dias * 24 horas * 60 minutos
-        timestamp = now - timedelta(minutes=i)
+    now = datetime.now() - timedelta(days=2)  # Começando 2 dias atrás
+    for i in range(0, 2 * 24 * 60, 2):  # 2 dias * 24 horas * 60 minutos, intervalo de 2 minutos
+        timestamp = now + timedelta(minutes=i)
         sensor1_value = random.uniform(20, 40)
         sensor2_value = random.uniform(15, 35)
         sensor3_value = random.uniform(10, 30)
@@ -66,14 +66,14 @@ def insert_accelerometer_data():
     connection.commit()
     connection.close()
 
-# Função para inserir dados simulados de severidade
+# Função para inserir dados simulados de severidade a cada 2 minutos começando dois dias atrás
 def insert_severity_data():
     connection = sqlite3.connect('Data/severidade.db')
     cursor = connection.cursor()
 
-    now = datetime.now()
-    for i in range(7 * 24 * 60):
-        timestamp = now - timedelta(minutes=i)
+    now = datetime.now() - timedelta(days=2)
+    for i in range(0, 2 * 24 * 60, 2):
+        timestamp = now + timedelta(minutes=i)
         severity_value = random.uniform(0.5, 5.0)  # Valores simulados de severidade
 
         cursor.execute('''
@@ -84,14 +84,14 @@ def insert_severity_data():
     connection.commit()
     connection.close()
 
-# Função para inserir dados simulados de envelope
+# Função para inserir dados simulados de envelope a cada 2 minutos começando dois dias atrás
 def insert_envelope_data():
     connection = sqlite3.connect('Data/envelope.db')
     cursor = connection.cursor()
 
-    now = datetime.now()
-    for i in range(7 * 24 * 60):
-        timestamp = now - timedelta(minutes=i)
+    now = datetime.now() - timedelta(days=2)
+    for i in range(0, 2 * 24 * 60, 2):
+        timestamp = now + timedelta(minutes=i)
         envelope_value = random.uniform(1.0, 10.0)  # Valores simulados de envelope
 
         cursor.execute('''

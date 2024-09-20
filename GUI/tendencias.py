@@ -1,12 +1,17 @@
 import customtkinter as ctk
 from tkcalendar import DateEntry
 from tkinter import Spinbox
-from datetime import datetime, timedelta
+from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.dates import DateFormatter
-from Models.acelerometros import fetch_sensor_data, fetch_severity_data, fetch_envelope_data  # Corrigido para fetch_sensor_data
+from matplotlib.ticker import MaxNLocator
+from Models.acelerometros import fetch_sensor_data, fetch_severity_data, fetch_envelope_data
 from Utils.clear_main_frame import clear_main_frame
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 
 def show_graph(main_frame):
     clear_main_frame(main_frame)
@@ -52,7 +57,8 @@ def show_graph(main_frame):
     acelerometro_frame = ctk.CTkFrame(master=main_frame)
     acelerometro_frame.pack(pady=10, padx=20, fill='x')
 
-    for i, name in enumerate(["Acelerômetro 1", "Acelerômetro 2", "Acelerômetro 3"]):
+    acelerometro_names = ["Acelerômetro 1", "Acelerômetro 2", "Acelerômetro 3"]
+    for i, name in enumerate(acelerometro_names):
         var = ctk.IntVar(value=1)
         acelerometro_vars.append(var)
         acelerometro_checkbox = ctk.CTkCheckBox(master=acelerometro_frame, text=name, variable=var)
@@ -78,24 +84,47 @@ def show_graph(main_frame):
         severity_data = fetch_severity_data(start_timestamp, end_timestamp)
         envelope_data = fetch_envelope_data(start_timestamp, end_timestamp)
 
-        # Plotagem dos gráficos (você pode expandir esta seção com base nos dados retornados)
+        # Garantir que os dados estão ordenados pelo tempo
+        acelerometro_data = sorted(acelerometro_data, key=lambda x: x[0])
+        severity_data = sorted(severity_data, key=lambda x: x[0])
+        envelope_data = sorted(envelope_data, key=lambda x: x[0])
+
+        # Converter os resultados de zip para listas acessíveis
+        acelerometro_data = list(zip(*acelerometro_data))
+        severity_data = list(zip(*severity_data))
+        envelope_data = list(zip(*envelope_data))
+
+        # Plotagem dos gráficos
         if graph_canvas:
             graph_canvas.get_tk_widget().pack_forget()  # Remover gráfico anterior
 
         fig, ax = plt.subplots(figsize=(10, 5))
 
+        # Verificar se os acelerômetros foram selecionados
         if acelerometro_data:
-            timestamps, sensor1_values, sensor2_values, sensor3_values = zip(*acelerometro_data)
-            ax.plot(timestamps, sensor1_values, label='Acelerômetro 1', marker='o', color='blue')
-            ax.plot(timestamps, sensor2_values, label='Acelerômetro 2', marker='x', color='green')
-            ax.plot(timestamps, sensor3_values, label='Acelerômetro 3', marker='s', color='red')
+            # Converta os timestamps para datetime antes de plotar
+            timestamps = [datetime.strptime(ts, '%Y-%m-%d %H:%M:%S') for ts in acelerometro_data[0]]
+            sensor1_values = acelerometro_data[1]
+            sensor2_values = acelerometro_data[2]
+            sensor3_values = acelerometro_data[3]
 
+            if acelerometro_vars[0].get():  # Acelerômetro 1
+                ax.plot(timestamps, sensor1_values, label='Acelerômetro 1', marker='o', color='blue')
+            if acelerometro_vars[1].get():  # Acelerômetro 2
+                ax.plot(timestamps, sensor2_values, label='Acelerômetro 2', marker='x', color='green')
+            if acelerometro_vars[2].get():  # Acelerômetro 3
+                ax.plot(timestamps, sensor3_values, label='Acelerômetro 3', marker='s', color='red')
+
+        # Verificar Severidade
         if severity_var.get() and severity_data:
-            severity_timestamps, severity_values = zip(*severity_data)
+            severity_timestamps = [datetime.strptime(ts, '%Y-%m-%d %H:%M:%S') for ts in severity_data[0]]
+            severity_values = severity_data[1]
             ax.plot(severity_timestamps, severity_values, label='Severidade de Vibração', marker='D', linestyle='--', color='purple')
 
+        # Verificar Envelope
         if envelope_var.get() and envelope_data:
-            envelope_timestamps, envelope_values = zip(*envelope_data)
+            envelope_timestamps = [datetime.strptime(ts, '%Y-%m-%d %H:%M:%S') for ts in envelope_data[0]]
+            envelope_values = envelope_data[1]
             ax.plot(envelope_timestamps, envelope_values, label='Envelope de Aceleração', marker='v', linestyle='--', color='orange')
 
         ax.set_xlabel('Timestamp')
@@ -103,6 +132,8 @@ def show_graph(main_frame):
         ax.legend(loc='upper left', fontsize='small')
         ax.grid(True)
 
+        # Ajustar o eixo X para melhorar legibilidade
+        ax.xaxis.set_major_locator(MaxNLocator(10))  # Limitar número de rótulos no eixo X
         fig.autofmt_xdate(rotation=45)
         ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M'))
 
