@@ -12,7 +12,6 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-
 def show_graph(main_frame):
     clear_main_frame(main_frame)
     
@@ -43,26 +42,29 @@ def show_graph(main_frame):
     end_minute_entry = Spinbox(master=date_frame, from_=0, to=59, width=3, format='%02.0f')
     end_minute_entry.grid(row=1, column=4, padx=5)
 
-    # Reorganizar os ticks: Severidade e Envelope primeiro
+    # Organizar Severidade e Envelope na mesma linha e alinhados à esquerda
+    checkbox_frame = ctk.CTkFrame(master=main_frame)
+    checkbox_frame.pack(pady=10, padx=20, fill='x', anchor='w')
+
     severity_var = ctk.IntVar(value=1)
-    severity_checkbox = ctk.CTkCheckBox(master=main_frame, text="Severidade de Vibração", variable=severity_var)
-    severity_checkbox.pack(pady=10)
+    severity_checkbox = ctk.CTkCheckBox(master=checkbox_frame, text="Severidade de Vibração", variable=severity_var)
+    severity_checkbox.grid(row=0, column=0, padx=10, pady=5, sticky='w')
 
     envelope_var = ctk.IntVar(value=1)
-    envelope_checkbox = ctk.CTkCheckBox(master=main_frame, text="Envelope de Aceleração", variable=envelope_var)
-    envelope_checkbox.pack(pady=10)
+    envelope_checkbox = ctk.CTkCheckBox(master=checkbox_frame, text="Envelope de Aceleração", variable=envelope_var)
+    envelope_checkbox.grid(row=0, column=1, padx=10, pady=5, sticky='w')
 
-    # Acelerômetros abaixo de Severidade e Envelope
+    # Acelerômetros na mesma linha, alinhados à esquerda
     acelerometro_vars = []
     acelerometro_frame = ctk.CTkFrame(master=main_frame)
-    acelerometro_frame.pack(pady=10, padx=20, fill='x')
+    acelerometro_frame.pack(pady=10, padx=20, fill='x', anchor='w')
 
     acelerometro_names = ["Acelerômetro 1", "Acelerômetro 2", "Acelerômetro 3"]
     for i, name in enumerate(acelerometro_names):
         var = ctk.IntVar(value=1)
         acelerometro_vars.append(var)
         acelerometro_checkbox = ctk.CTkCheckBox(master=acelerometro_frame, text=name, variable=var)
-        acelerometro_checkbox.grid(row=i, column=0, padx=10, pady=5, sticky='w')
+        acelerometro_checkbox.grid(row=0, column=i, padx=10, pady=5, sticky='w')
 
     graph_canvas = None
 
@@ -142,7 +144,7 @@ def show_graph(main_frame):
         graph_canvas.get_tk_widget().pack(pady=20, fill='both', expand=True)
 
     # Botão para atualizar o gráfico com as novas seleções
-    update_button = ctk.CTkButton(master=main_frame, text="Atualizar Tendências", command=plot_graph, height=40, width=200, font=('Arial', 14))
+    update_button = ctk.CTkButton(master=main_frame, text="Atualizar Dados", command=plot_graph, height=40, width=200, font=('Arial', 14))
     update_button.pack(pady=20)
 
     plot_graph()

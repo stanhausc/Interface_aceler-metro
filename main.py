@@ -13,6 +13,10 @@ from GUI.contact import show_contact_info
 
 # Criar a janela principal
 root = ctk.CTk()
+
+# Configurar tema escuro
+ctk.set_appearance_mode("dark")
+
 root.geometry("1000x700")
 root.title("Vibration Acelerômetro Data Viewer")
 
@@ -48,4 +52,3 @@ contact_button.pack(pady=10, padx=10)
 show_acelerometro_data(main_frame)
 
 root.mainloop()
- 
